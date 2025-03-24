@@ -1,0 +1,6 @@
+.vscode/
+sd/
+TASKS/
+boot_out.txt
+main.py
+settings.toml
