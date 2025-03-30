@@ -3,25 +3,25 @@ import time
 import busio
 from lib import BMP280
 
-################################### Setup
-#initial delay
+################################### Настройка
+# начальная задержка
 time.sleep(1)
-#Create i2c module object
+# Создаем объект модуля i2c
 i2c1_module = busio.I2C(scl=board.IO2, sda=board.IO3)
-#Create bmp280 object
+# Создаем объект bmp280
 bmp280      = BMP280.Adafruit_BMP280_I2C(i2c1_module, BMP280._BMP280_ADDRESS)
-#Set zero pressure
-bmp280.sea_level_pressure = 101.325 #kPa
+# Устанавливаем давление на уровне моря
+bmp280.sea_level_pressure = 101.325 # кПа
 
-################################### Work
+################################### Работа
 while True:
-    #Get data from device
+    # Получаем данные с устройства
     temp    = bmp280.temperature()
     press   = bmp280.pressure()
     alt     = bmp280.altitude()
 
-    #print
-    print(f"\nTemperature   : {temp} C")
-    print(f"Pressure      : {press} kPa")
-    print(f"Altitude      : {alt} meters")
+    # выводим
+    print(f"\nТемпература   : {temp} C")
+    print(f"Давление      : {press} кПа")
+    print(f"Высота        : {alt} метров")
     time.sleep(2)

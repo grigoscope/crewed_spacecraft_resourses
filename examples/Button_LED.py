@@ -1,17 +1,17 @@
 import board
 import digitalio
 
-################################### Setup
-#Create button object
+################################### Настройка
+#Создаем объект кнопки
 button           = digitalio.DigitalInOut(board.IO9)
 button.direction = digitalio.Direction.INPUT
 button.pull      = digitalio.Pull.UP
 
-#Create led object
+#Создаем объект светодиода
 led = digitalio.DigitalInOut(board.IO8)
 led.direction = digitalio.Direction.OUTPUT
 
-################################### Work
+################################### Работа
 while True:
-    #led != button
+    #светодиод != кнопка
     led.value = not button.value

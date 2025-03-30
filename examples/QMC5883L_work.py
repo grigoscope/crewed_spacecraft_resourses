@@ -4,28 +4,22 @@ import busio
 import math
 from lib import QMC5883L
 
-################################### Setup
-#initial delay
+################################### Настройка
+# начальная задержка
 time.sleep(1)
-#Create i2c module object
+# Создаем объект модуля i2c
 i2c1_module = busio.I2C(scl=board.IO2, sda=board.IO3)
-#Create qmc5883l object
+# Создаем объект qmc5883l
 qmc5883l     = QMC5883L.QMC5883L_I2C(i2c1_module, QMC5883L.QMC5883L_DEFAULT_ADDRESS)
 
-################################### Work
+################################### Работа
 while True:
-    #Get data from device
+    # Получаем данные с устройства
     temp = qmc5883l.temperature()
     mag = qmc5883l.magnetometer()
 
-    #print
-    print(f"\nTemperature   : {temp} C") #Relative !
-    print(f"Magnetometer: X:{mag[0]}, Y: {mag[1]}, Z: {mag[2]} mTesla")
-
-    # azimuth = math.atan2(mag[1], mag[0])      # Need Calib
-    # degrees = math.degrees(azimuth)
-    # degrees += 9  #https://go-hiking.ru/tools/declination/ -  Moscow ~ 9`
-    # print(f"Compass: {degrees} degree")
-
+    # выводим
+    print(f"\nТемпература   : {temp} C") # Относительная!
+    print(f"Магнитометр: X:{mag[0]}, Y: {mag[1]}, Z: {mag[2]} мТл")
 
     time.sleep(0.5)

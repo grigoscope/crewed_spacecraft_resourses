@@ -1,60 +1,35 @@
-import pwmio
 import board
 import time
-import digitalio
 
-#H-bridge specification
-# xIN1 | xIN2 |  FUNCTION
-# PWM  | 0    | Forward PWM, fast decay
-# 1    | PWM  | Forward PWM, slow decay
-# 0    | PWM  | Reverse PWM, fast decay
-# PWM  | 1    | Reverse PWM, slow decay
+from lib import DC_MOTOR
 
-################################### Setup
-#Create xIN1_PWM_pin object
+################################### Настройка
+
+# МОТОР A
 xIN1_PWM_pin  = board.IO21
-#Create xIN2_GPIO_pin object
 xIN2_GPIO_pin = board.IO47
 
-#Create xIN1 object
-xIN1 = pwmio.PWMOut(pin=xIN1_PWM_pin, duty_cycle=0, frequency=50)
+# МОТОР B - общий с сервоприводами 3/4
+# xIN1_PWM_pin  = board.IO42
+# xIN2_GPIO_pin = board.IO41
 
-#Create xIN2 object
-xIN2           = digitalio.DigitalInOut(xIN2_GPIO_pin)
-xIN2.direction = digitalio.Direction.OUTPUT
+dc_mot = DC_MOTOR.MOTOR(xIN1_PWM_pin, xIN2_GPIO_pin)
 
-#DC motor speed control -100 ... 100 %
-def DCMotorSetSpeed(speed):
-    #clamp
-    if(speed < -100):   
-        speed = -100
-    if(speed > 100):
-        speed = 100
-    
-    #"Clear" duty cycle
-    duty = abs(speed) * 65535.0/100.0
-
-    #Inversion if reverse 
-    duty = (65535.0-duty) if speed < 0 else duty
-    xIN2.value = True if speed < 0 else False
-
-    xIN1.duty_cycle = int(duty)
-
-################################### Work
-#Start point
+################################### Работа
+# Начальная точка
 speed = 0
 dir   = 1
 while True:
     time.sleep(0.05)
-    #Change direction
+    # Изменение направления
     if(dir == 1  and speed == 100):
         dir = -1
     if(dir == -1 and speed == -100):
         dir = 1
 
-    #Change speed
+    # Изменение скорости
     speed += dir
-    DCMotorSetSpeed(speed)
+    dc_mot.DCMotorSetSpeed(speed)
 
-    #print
+    # Вывод
     print(f"Direction : {dir}, Speed: {speed}")

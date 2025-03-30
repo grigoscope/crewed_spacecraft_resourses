@@ -5,73 +5,68 @@ import busio
 import math
 from lib import Ra01S
 
-################################### Setup
-#initial delay
+################################### Настройка
+# начальная задержка
 time.sleep(1)
 
-#Create SDCard_cs_pin object
+# Создание объекта SDCard_cs_pin
 SDCard_cs_pin  = board.IO15
 
-#Create SDCard_cs object , (!) before init spi
+# Создание объекта SDCard_cs, (!) перед инициализацией SPI
 SDCard_cs = digitalio.DigitalInOut(SDCard_cs_pin)
 SDCard_cs.direction = digitalio.Direction.OUTPUT
 SDCard_cs.value = True
 
-#Create spi module object
+# Создание объекта модуля SPI
 spi0_speed = 2000000
 spi0_module     = busio.SPI(clock=board.IO12, MOSI=board.IO11, MISO=board.IO13)
 
-#Create pins object
+# Создание объектов пинов
 Ra01S_cs_pin    = board.IO7
 Ra01S_nRst_pin  = board.IO6
 Ra01S_nInt_pin  = board.IO5
 
-#Create Ra01S_cs object
+# Создание объекта Ra01S_cs
 Ra01S_cs = digitalio.DigitalInOut(Ra01S_cs_pin)
 Ra01S_cs.direction = digitalio.Direction.OUTPUT
 Ra01S_cs.value = True
 
-#Create Ra01S_nRst object
+# Создание объекта Ra01S_nRst
 Ra01S_nRst = digitalio.DigitalInOut(Ra01S_nRst_pin)
 Ra01S_nRst.direction = digitalio.Direction.OUTPUT
 Ra01S_nRst.value = True
 
-#Create Ra01S_nInt object
+# Создание объекта Ra01S_nInt
 Ra01S_nInt = digitalio.DigitalInOut(Ra01S_nInt_pin)
 Ra01S_nInt.direction = digitalio.Direction.INPUT
 
-#Create Ra01S object
+# Создание объекта Ra01S
 Ra01S     = Ra01S.Ra01S_SPI(spi0_module, Ra01S_cs, Ra01S_nRst, Ra01S_nInt, spi0_speed)
 
-#First init and turn on
+# Первая инициализация и включение
 Ra01S.on()
 
-#Set power mode
+# Установка режима энергосбережения
 Ra01S.SetLowPower()
 #Ra01S.SetLowPower()
 
-#Select channel 0-6
+# Выбор канала 0-6
 Ra01S.SetChannel(0) 
 
 main_uart = busio.UART(board.TX, board.RX, baudrate=9600, timeout=10)
 
-################################### Work
+################################### Работа
 num_string_msg = 0
+# Основной цикл программы
 while True:
-    test = 1 # 0- Rec string, 1- Rec telemetry pack
-
-    if(test == 0):
-        if(Ra01S.AvailablePacket()):
-            num_string_msg+=1
-            print(f"Number: {num_string_msg}, Message: {Ra01S.ReciveS()}" , end="")
-        # else:
-        #     print("empty")
-
+    # Проверяем, доступен ли пакет для получения
+    if(Ra01S.AvailablePacket()):
+        num_string_msg += 1
+        # Выводим номер сообщения и его содержимое
+        print(f"Номер: {num_string_msg}, Сообщение: {Ra01S.ReciveS()}", end="")
     else:
-       if(Ra01S.AvailablePacket()):
-          #print("Send Telemetry : 0, 0, 1, 512, -5, 45.123, 33.456")
-          stroka = Ra01S.ParceTelemetryPack()+"\n"
-          main_uart.write(stroka.encode())
-          print(stroka)
+        # Если пакетов нет, выводим "пусто"
+        print("пусто")
     
+    # Задержка перед следующей итерацией
     time.sleep(0.2)

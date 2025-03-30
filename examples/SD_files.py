@@ -7,35 +7,28 @@ import storage
 
 my_file = "my_log.txt"
 
-################################### Setup
-#initial delay
+################################### Настройка
+# начальная задержка
 time.sleep(1)
-#Create spi module object
+# Создание объекта модуля SPI
 spi0_module     = busio.SPI(clock=board.IO12, MOSI=board.IO11, MISO=board.IO13)
-#Create cs object
+# Создание объекта для вывода CS
 sd_card_cs_pin  = board.IO15
 
-
-#Create SDCard object
+# Создание объекта SDCard
 sd_card = sdcardio.SDCard(spi0_module, sd_card_cs_pin)
-#Create FileSystem object
+# Создание объекта файловой системы
 vfs     = storage.VfsFat(sd_card)
-#Mount FileSystem
+# Монтирование файловой системы
 storage.mount(vfs, '/sd')
 
-################################### Work
+################################### Работа
 
-#Open File to write (append mode)
+# Открытие файла для записи (режим добавления)
 f = open("/sd/"+my_file, "a")
-#Write (next line = "\r\n")
+# Запись (следующая строка = "\r\n")
 f.write("Hello, world!\r\n")
 f.close()
 
-#Open File to read 
-f = open("/sd/"+my_file, "r")
-#Read All ((!)Only 5-6 MB RAM available(!))
-contents = f.read()
-print(contents)
-f.close()
-
+# Размонтирование файловой системы
 storage.umount('/sd')

@@ -1,20 +1,15 @@
-
 import time
 import board
 import adafruit_hcsr04
 
-# trigger_pin=board.IO5 #Shared with RADIO_BUSY
-# echo_pin=board.IO16 #Shared with MAG_DATA_READY(NOT USED)
-#or
-trigger_pin=board.IO21 #Shared with motor A (pin1)
-echo_pin=board.IO14 #Shared with ACC_MAG_DATA_READY (NOT USED)
+trigger_pin=board.IO21 # Пин A02, используется для отправки ультразвукового сигнала
+echo_pin=board.IO14    # Пин A03, используется для приема отраженного ультразвукового сигнала
 
+# Создаем объект для работы с ультразвуковым датчиком HC-SR04
 sonar = adafruit_hcsr04.HCSR04(trigger_pin=trigger_pin, echo_pin=echo_pin)
 
+# Бесконечный цикл для измерения расстояния
 while True:
-    try:
-            print((sonar.distance,))
-    except RuntimeError:
-            print("Retrying!")
-            pass
-    time.sleep(0.1)
+        print((sonar.distance,))
+        # Задержка в 0.1 секунды перед следующим измерением
+        time.sleep(0.1)

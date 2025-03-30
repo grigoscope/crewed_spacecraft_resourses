@@ -3,23 +3,23 @@ import board
 import busio
 from lib import LSM6DSL
 
-################################### Setup
-#initial delay
+################################### Настройка
+# начальная задержка
 time.sleep(1)
-#Create i2c module object
+# Создаем объект модуля i2c
 i2c1_module = busio.I2C(scl=board.IO2, sda=board.IO3)
-#Create lsm6dsl object
+# Создаем объект lsm6dsl
 lsm6dsl     = LSM6DSL.LSM6DSL_I2C(i2c1_module, LSM6DSL.LSM6DSL_DEFAULT_ADDRESS)
 
-################################### Work
+################################### Работа
 while True:
-    #Get data from device
+    # Получаем данные с устройства
     acc = lsm6dsl.acceleration()
     gyro = lsm6dsl.gyro()
     temp = lsm6dsl.temperature()
     
-    #print
-    print(f"\nTemperature   : {temp} C")
-    print(f"Acceleration: X:{acc[0]}, Y: {acc[1]}, Z: {acc[2]} m/s^2")
-    print(f"Gyro: X:{gyro[0]}, Y: {gyro[1]}, Z: {gyro[2]} degree/s")
+    # выводим
+    print(f"\nТемпература   : {temp} C")
+    print(f"Ускорение: X:{acc[0]}, Y: {acc[1]}, Z: {acc[2]} м/с^2")
+    print(f"Гироскоп: X:{gyro[0]}, Y: {gyro[1]}, Z: {gyro[2]} градусов/с")
     time.sleep(0.5)
