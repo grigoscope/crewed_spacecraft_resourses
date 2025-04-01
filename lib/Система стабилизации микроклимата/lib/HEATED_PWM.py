@@ -39,10 +39,10 @@ class HEATER:
     def SetHeat(self, heat):
         # Heat control 0 ... 100 %
         # Calculate duty cycle based on speed
-        duty = heat * 65535.0 / 100.0
+        duty = heat * 20000.0 / 100.0
 
         # Set xIN2 value based on direction
-        self.xIN2.value = True
+        self.xIN2.value = True if heat > 0 else False
 
         # Update PWM duty cycle
         self.xIN1.duty_cycle = int(duty)
