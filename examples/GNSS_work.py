@@ -25,7 +25,5 @@ while True:
     # Обновление данных GNSS
     gnss.update()
 
-    # Вывод широты
-    print("Latitude: {0:.6f} degrees".format(gnss.latitude))
-    # Вывод долготы
-    print("Longitude: {0:.6f} degrees".format(gnss.longitude))
+    # Вывод широты и долготы
+    print(f"Широта: {gnss.latitude} Долгота: {gnss.longitude}")
