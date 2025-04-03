@@ -50,8 +50,8 @@ Ra01S.on()
 Ra01S.SetLowPower()
 # Ra01S.SetLowPower()
 
-# Выбор канала 0-6
-Ra01S.SetChannel(0) 
+# Выбор канала 1-6
+Ra01S.SetChannel(1) 
 
 ################################### Работа
 while True:
