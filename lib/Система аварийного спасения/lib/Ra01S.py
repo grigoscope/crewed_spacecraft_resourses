@@ -1,6 +1,8 @@
 import struct
 import time
 import math
+import digitalio
+from microcontroller import Pin
 from busio import SPI
 from I2C_SPI_protocol_Base import SPI_Impl
 from digitalio import DigitalInOut
@@ -9,17 +11,58 @@ from LLCC68 import *
 
 class Ra01S:
 ############################################################# HI CODE ZONE
-    def __init__(self, bus_implementation: SPI_Impl, cs: DigitalInOut, nRst: DigitalInOut, nInt: DigitalInOut) -> None:
+    def __init__(self, bus_implementation: SPI_Impl, cs: Pin, nRst: Pin, nInt: Pin, csSD : Pin) -> None:
         self._bus_implementation = bus_implementation
 
-        self.SX126x_SPI_SELECT = cs
-        self.SX126x_RESET      = nRst
-        self.SX126x_BUSY       = nInt
+        self.pin_prepare(cs, nRst, nInt, csSD)
 
         self.powerTx = 10
         self.freq    = 435E6
 
         self.on()
+
+    def __del__(self):
+        try:
+            self._bus_implementation._spi.deinit()
+        except Exception:
+            pass
+        try:
+            self.SX126x_SPI_SELECT.deinit()
+            self.SX126x_RESET.deinit()
+            self.SX126x_BUSY.deinit()
+            self.SD_SPI_SELECT.deinit()
+        except Exception:
+            pass
+
+
+    def pin_prepare(self, cs: Pin, nRst: Pin, nInt: Pin, csSD : Pin):
+        try:
+            #Create SDCard_cs object , (!) before init spi
+            SDCard_cs = digitalio.DigitalInOut(csSD)
+            SDCard_cs.direction = digitalio.Direction.OUTPUT
+            SDCard_cs.value = True
+            self.SD_SPI_SELECT     = SDCard_cs
+        except Exception:
+            pass
+
+        #Create Ra01S_cs object
+        Ra01S_cs = digitalio.DigitalInOut(cs)
+        Ra01S_cs.direction = digitalio.Direction.OUTPUT
+        Ra01S_cs.value = True
+
+        #Create Ra01S_nRst object
+        Ra01S_nRst = digitalio.DigitalInOut(nRst)
+        Ra01S_nRst.direction = digitalio.Direction.OUTPUT
+        Ra01S_nRst.value = True
+
+        #Create Ra01S_nInt object
+        Ra01S_nInt = digitalio.DigitalInOut(nInt)
+        Ra01S_nInt.direction = digitalio.Direction.INPUT
+
+        self.SX126x_SPI_SELECT = Ra01S_cs
+        self.SX126x_RESET      = Ra01S_nRst
+        self.SX126x_BUSY       = Ra01S_nInt
+
 
     def on(self):
         self.packet = 0
@@ -101,12 +144,12 @@ class Ra01S:
         len_ = 23
         int_arr, rxLen =  self._Receive(255) 
         msg = ""
-
+        byte_arr = bytearray(struct.pack(f"{len_}B", *int_arr)) #Transform int_array 2 byte_arr
+            
         if( rxLen == len_ and chr(int_arr[0]=='*') and chr(int_arr[22])=='#'):
             self.packet+=1
             
-            byte_arr = bytearray(struct.pack(f"{len_}B", *int_arr)) #Transform int_array 2 byte_arr
-            
+
             #My packet 
             msg+="R:"+str(struct.unpack('<I', byte_arr[1:5])[0])
             msg+="/"+str(self.packet) 
@@ -263,7 +306,7 @@ class Ra01S:
             self._SetTx(500)
 
             if ( mode & SX126x_TXMODE_SYNC ):
-                timeout = time.monotonic() + 0.1
+                timeout = time.monotonic() + 0.5
                 irqStatus = self._GetIrqStatus()
 
                 while ( ( not(irqStatus & SX126X_IRQ_TX_DONE)) and ( not (irqStatus & SX126X_IRQ_TIMEOUT)) ):
@@ -706,5 +749,5 @@ class Ra01S:
 
 
 class Ra01S_SPI(Ra01S):
-    def __init__(self, spi: SPI, cs: DigitalInOut, nRst : DigitalInOut, nInt : DigitalInOut, baudrate: int = 100000) -> None:
-        super().__init__(SPI_Impl(spi, None, baudrate), cs, nRst, nInt) #We don't hand over the CS, because we control it ourselves
+    def __init__(self, spi: SPI, cs: Pin, nRst : Pin, nInt : Pin, csSD : Pin, baudrate: int = 100000) -> None:
+        super().__init__(SPI_Impl(spi, None, baudrate), cs, nRst, nInt, csSD) #We don't hand over the CS, because we control it ourselves
