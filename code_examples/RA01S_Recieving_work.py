@@ -26,22 +26,8 @@ Ra01S_cs_pin    = board.IO7
 Ra01S_nRst_pin  = board.IO6
 Ra01S_nInt_pin  = board.IO5
 
-# Создание объекта Ra01S_cs
-Ra01S_cs = digitalio.DigitalInOut(Ra01S_cs_pin)
-Ra01S_cs.direction = digitalio.Direction.OUTPUT
-Ra01S_cs.value = True
-
-# Создание объекта Ra01S_nRst
-Ra01S_nRst = digitalio.DigitalInOut(Ra01S_nRst_pin)
-Ra01S_nRst.direction = digitalio.Direction.OUTPUT
-Ra01S_nRst.value = True
-
-# Создание объекта Ra01S_nInt
-Ra01S_nInt = digitalio.DigitalInOut(Ra01S_nInt_pin)
-Ra01S_nInt.direction = digitalio.Direction.INPUT
-
 # Создание объекта Ra01S
-Ra01S     = Ra01S.Ra01S_SPI(spi0_module, Ra01S_cs, Ra01S_nRst, Ra01S_nInt, spi0_speed)
+Ra01S     = Ra01S.Ra01S_SPI(spi0_module, Ra01S_cs_pin, Ra01S_nRst_pin, Ra01S_nInt_pin, spi0_speed)
 
 # Первая инициализация и включение
 Ra01S.on()
@@ -51,7 +37,7 @@ Ra01S.SetLowPower()
 #Ra01S.SetLowPower()
 
 # Выбор канала 0-6
-Ra01S.SetChannel(0) 
+Ra01S.SetChannel(6) 
 
 main_uart = busio.UART(board.TX, board.RX, baudrate=9600, timeout=10)
 
@@ -59,14 +45,4 @@ main_uart = busio.UART(board.TX, board.RX, baudrate=9600, timeout=10)
 num_string_msg = 0
 # Основной цикл программы
 while True:
-    # Проверяем, доступен ли пакет для получения
-    if(Ra01S.AvailablePacket()):
-        num_string_msg += 1
-        # Выводим номер сообщения и его содержимое
-        print(f"Номер: {num_string_msg}, Сообщение: {Ra01S.ReciveS()}", end="")
-    else:
-        # Если пакетов нет, выводим "пусто"
-        print("пусто")
-    
-    # Задержка перед следующей итерацией
-    time.sleep(0.2)
+    print(f"{Ra01S.ReciveS()}", end="")
